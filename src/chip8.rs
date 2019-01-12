@@ -83,6 +83,13 @@ impl<R: Rng> Chip8<R> {
         })
     }
 
+    pub fn pixels(&self) -> impl Iterator<Item = (usize, usize, &u8)> {
+        self.vram
+            .iter()
+            .enumerate()
+            .flat_map(|(y, r)| r.iter().enumerate().map(move |(x, c)| (y, x, c)))
+    }
+
     pub fn keypress(&mut self, hex_key: u8) {
         debug_assert!(
             usize::from(hex_key) < self.keyboard.len(),
