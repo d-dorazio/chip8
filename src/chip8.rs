@@ -150,7 +150,7 @@ impl Chip8 {
             0xF if nn == 0x1E => self.add_i(x),
             0xF if nn == 0x29 => self.font_sprite_addr(x),
 
-            0xF if nn == 0x33 => unimplemented!("binary coded decimal"),
+            0xF if nn == 0x33 => self.bcd(x),
             0xF if nn == 0x55 => self.dump_regs(x),
             0xF if nn == 0x65 => self.load_regs(x),
 
@@ -341,6 +341,18 @@ impl Chip8 {
 
     fn wait_keypress(&mut self, x: usize) {
         self.waiting_keypress_reg = Some(x);
+    }
+
+    // ------------------------------------------------------------------------
+    // Misc
+    // ------------------------------------------------------------------------
+    fn bcd(&mut self, x: usize) {
+        let r = self.registers[x];
+
+        let i = usize::from(self.i_reg);
+        self.ram[i] = r / 100;
+        self.ram[i + 1] = (r / 10) % 10;
+        self.ram[i + 2] = r % 10;
     }
 
     // ------------------------------------------------------------------------
