@@ -147,7 +147,7 @@ impl<R: Rng> Chip8<R> {
 
             0xD => self.draw(x, y, n),
 
-            0xE if nn == 0x93 => self.skip_if_pressed(x),
+            0xE if nn == 0x9E => self.skip_if_pressed(x),
             0xE if nn == 0xA1 => self.skip_if_not_pressed(x),
 
             0xF if nn == 0x07 => self.store_delay(x),
@@ -161,9 +161,7 @@ impl<R: Rng> Chip8<R> {
             0xF if nn == 0x55 => self.dump_regs(x),
             0xF if nn == 0x65 => self.load_regs(x),
 
-            _ => {
-                // noop
-            }
+            _ => unreachable!("opcode {:X} not recognized at pc: {:X}", instr, self.pc - 2),
         };
     }
 
