@@ -1,3 +1,5 @@
+use rand::Rng;
+
 pub const PIXELS: usize = 32 * 64;
 pub const RAM_SIZE: usize = 4096;
 pub const PROGRAM_START_PC: usize = 0x200;
@@ -23,7 +25,7 @@ const FONT_SET: [u8; 80] = [
 ];
 
 #[derive(Clone)]
-pub struct Chip8 {
+pub struct Chip8<R: Rng> {
     registers: [u8; 16],
     i_reg: u16,
 
@@ -40,10 +42,12 @@ pub struct Chip8 {
 
     waiting_keypress_reg: Option<usize>,
     keyboard: [bool; 16],
+
+    rng: R,
 }
 
-impl Chip8 {
-    pub fn with_program(program: &[u8]) -> Option<Self> {
+impl<R: Rng> Chip8<R> {
+    pub fn with_program(rng: R, program: &[u8]) -> Option<Self> {
         if program.len() > RAM_SIZE - PROGRAM_START_PC {
             return None;
         }
@@ -73,6 +77,8 @@ impl Chip8 {
 
             waiting_keypress_reg: None,
             keyboard: [false; 16],
+
+            rng,
         })
     }
 
@@ -136,7 +142,7 @@ impl Chip8 {
 
             0xB => self.goto_off(nnn),
 
-            0xC => unimplemented!("rand"),
+            0xC => self.rand(x, nn),
 
             0xD => unimplemented!("draw"),
 
@@ -353,6 +359,10 @@ impl Chip8 {
         self.ram[i] = r / 100;
         self.ram[i + 1] = (r / 10) % 10;
         self.ram[i + 2] = r % 10;
+    }
+
+    fn rand(&mut self, x: usize, nn: u8) {
+        self.registers[x] = self.rng.gen::<u8>() & nn;
     }
 
     // ------------------------------------------------------------------------
