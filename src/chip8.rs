@@ -1,6 +1,7 @@
 use rand::Rng;
 
-pub const PIXELS: usize = 32 * 64;
+pub const DISPLAY_WIDTH: usize = 32;
+pub const DISPLAY_HEIGHT: usize = 64;
 pub const RAM_SIZE: usize = 4096;
 pub const PROGRAM_START_PC: usize = 0x200;
 
@@ -30,7 +31,7 @@ pub struct Chip8<R: Rng> {
     i_reg: u16,
 
     ram: [u8; RAM_SIZE],
-    vram: [u8; PIXELS / 8],
+    vram: [[u8; DISPLAY_WIDTH]; DISPLAY_HEIGHT],
 
     pc: usize,
 
@@ -65,7 +66,7 @@ impl<R: Rng> Chip8<R> {
             i_reg: 0,
 
             ram,
-            vram: [0; PIXELS / 8],
+            vram: [[0; DISPLAY_WIDTH]; DISPLAY_HEIGHT],
 
             pc: PROGRAM_START_PC,
 
@@ -144,7 +145,7 @@ impl<R: Rng> Chip8<R> {
 
             0xC => self.rand(x, nn),
 
-            0xD => unimplemented!("draw"),
+            0xD => self.draw(x, y, n),
 
             0xE if nn == 0x93 => self.skip_if_pressed(x),
             0xE if nn == 0xA1 => self.skip_if_not_pressed(x),
@@ -369,8 +370,29 @@ impl<R: Rng> Chip8<R> {
     // Graphics
     // ------------------------------------------------------------------------
     fn clear_vram(&mut self) {
-        for b in self.vram.iter_mut() {
-            *b = 0;
+        for row in self.vram.iter_mut() {
+            for b in row.iter_mut() {
+                *b = 0;
+            }
+        }
+    }
+
+    fn draw(&mut self, x: usize, y: usize, n: u8) {
+        self.registers[0xF] = 0;
+
+        let y = usize::from(self.registers[y]);
+        let x = usize::from(self.registers[x]);
+        let sprite_start = usize::from(self.i_reg);
+
+        for i in 0..usize::from(n) {
+            let sprite_row = self.ram[sprite_start + i];
+
+            for b in 0..8 {
+                let sprite_pix = (sprite_row >> (7 - b)) & 0x1;
+
+                self.registers[0xF] |= self.vram[y + i][x + b] & sprite_pix;
+                self.vram[y + i][x + b] ^= sprite_pix;
+            }
         }
     }
 }
