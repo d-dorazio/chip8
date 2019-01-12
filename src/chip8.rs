@@ -1,7 +1,7 @@
 use rand::Rng;
 
-pub const DISPLAY_WIDTH: usize = 32;
-pub const DISPLAY_HEIGHT: usize = 64;
+pub const DISPLAY_WIDTH: usize = 64;
+pub const DISPLAY_HEIGHT: usize = 32;
 pub const RAM_SIZE: usize = 4096;
 pub const PROGRAM_START_PC: usize = 0x200;
 
