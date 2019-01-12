@@ -383,13 +383,21 @@ impl<R: Rng> Chip8<R> {
         let sprite_start = usize::from(self.i_reg);
 
         for i in 0..usize::from(n) {
-            let sprite_row = self.ram[sprite_start + i];
+            match self.ram.get(sprite_start + i) {
+                None => break,
+                Some(sprite_row) => {
+                    for b in 0..8 {
+                        match self.vram.get_mut(y + i).and_then(|r| r.get_mut(x + b)) {
+                            None => break,
+                            Some(cur_sprite_pix) => {
+                                let sprite_pix = (sprite_row >> (7 - b)) & 0x1;
 
-            for b in 0..8 {
-                let sprite_pix = (sprite_row >> (7 - b)) & 0x1;
-
-                self.registers[0xF] |= self.vram[y + i][x + b] & sprite_pix;
-                self.vram[y + i][x + b] ^= sprite_pix;
+                                self.registers[0xF] |= *cur_sprite_pix & sprite_pix;
+                                *cur_sprite_pix ^= sprite_pix;
+                            }
+                        }
+                    }
+                }
             }
         }
     }
