@@ -256,7 +256,6 @@ impl<R: Rng> Chip8<R> {
     // Math
     // ------------------------------------------------------------------------
     fn add_nn(&mut self, x: usize, nn: u8) {
-        // self.set_status_reg(u8::max_value() - self.registers[x] < nn);
         self.registers[x] = self.registers[x].wrapping_add(nn);
     }
 
@@ -268,17 +267,23 @@ impl<R: Rng> Chip8<R> {
     }
 
     fn sub_rr(&mut self, x: usize, y: usize) {
-        let (rx, c) = self.registers[x].overflowing_sub(self.registers[y]);
+        self.registers[0xF] = if self.registers[x] > self.registers[y] {
+            1
+        } else {
+            0
+        };
 
-        self.registers[x] = rx;
-        self.registers[0xF] = if c { 1 } else { 0 };
+        self.registers[x] = self.registers[x].wrapping_sub(self.registers[y]);
     }
 
     fn sub_rr_inv(&mut self, x: usize, y: usize) {
-        let (rx, c) = self.registers[y].overflowing_sub(self.registers[x]);
+        self.registers[0xF] = if self.registers[y] > self.registers[x] {
+            1
+        } else {
+            0
+        };
 
-        self.registers[x] = rx;
-        self.registers[0xF] = if c { 1 } else { 0 };
+        self.registers[x] = self.registers[y].wrapping_sub(self.registers[x]);
     }
 
     // ------------------------------------------------------------------------
@@ -314,10 +319,8 @@ impl<R: Rng> Chip8<R> {
     }
 
     fn add_i(&mut self, x: usize) {
-        let (i, c) = u16::from(self.registers[x]).overflowing_add(self.i_reg);
-
-        self.i_reg = i;
-        self.registers[0xF] = if c { 1 } else { 0 };
+        self.i_reg += u16::from(self.registers[x]);
+        self.registers[0xF] = if self.i_reg > 0x0F00 { 1 } else { 0 };
     }
 
     fn font_sprite_addr(&mut self, x: usize) {
@@ -405,24 +408,19 @@ impl<R: Rng> Chip8<R> {
 
         let y = usize::from(self.registers[y]);
         let x = usize::from(self.registers[x]);
+
         let sprite_start = usize::from(self.i_reg);
 
         for i in 0..usize::from(n) {
-            match self.ram.get(sprite_start + i) {
-                None => break,
-                Some(sprite_row) => {
-                    for b in 0..8 {
-                        match self.vram.get_mut(y + i).and_then(|r| r.get_mut(x + b)) {
-                            None => break,
-                            Some(cur_sprite_pix) => {
-                                let sprite_pix = (sprite_row >> (7 - b)) & 0x1;
+            let row = &mut self.vram[(y + i) % self.vram.len()];
+            let sprite_row = self.ram[sprite_start + i];
 
-                                self.registers[0xF] |= *cur_sprite_pix & sprite_pix;
-                                *cur_sprite_pix ^= sprite_pix;
-                            }
-                        }
-                    }
-                }
+            for b in 0..8 {
+                let cur_row_pix = &mut row[(x + b) % row.len()];
+                let sprite_pix = (sprite_row >> (7 - b)) & 0x1;
+
+                self.registers[0xF] |= *cur_row_pix & sprite_pix;
+                *cur_row_pix ^= sprite_pix;
             }
         }
     }
