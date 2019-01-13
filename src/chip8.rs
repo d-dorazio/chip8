@@ -83,6 +83,10 @@ impl<R: Rng> Chip8<R> {
         })
     }
 
+    pub fn beep(&self) -> bool {
+        self.sound_timer > 0
+    }
+
     pub fn decrease_timers(&mut self) {
         self.delay_timer = self.delay_timer.saturating_sub(1);
         self.sound_timer = self.sound_timer.saturating_sub(1);

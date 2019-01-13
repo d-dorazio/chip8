@@ -1,8 +1,11 @@
+mod utils;
+
 use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
 use std::time::Duration;
 
+use sdl2::audio::AudioSpecDesired;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
@@ -51,11 +54,24 @@ fn main() {
 
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
+    let audio_subsystem = sdl_context.audio().unwrap();
 
     let window = video_subsystem
         .window(env!("CARGO_PKG_NAME"), 640, 320)
         .position_centered()
         .build()
+        .unwrap();
+
+    let audio_spec = AudioSpecDesired {
+        freq: Some(44100),
+        channels: Some(1), // mono
+        samples: None,     // default sample size
+    };
+
+    let audio_device = audio_subsystem
+        .open_playback(None, &audio_spec, |spec| {
+            self::utils::SquareWave::new(240.0 / spec.freq as f32, 0.0, 0.25)
+        })
         .unwrap();
 
     let mut canvas = window.into_canvas().build().unwrap();
@@ -110,6 +126,12 @@ fn main() {
             canvas
                 .fill_rect(sdl2::rect::Rect::new(x as i32 * 10, y as i32 * 10, 10, 10))
                 .unwrap();
+        }
+
+        if chip8.beep() {
+            audio_device.resume();
+        } else {
+            audio_device.pause();
         }
 
         canvas.present();
