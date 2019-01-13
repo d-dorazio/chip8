@@ -110,6 +110,15 @@ impl<R: Rng> Chip8<R> {
         self.waiting_keypress_reg = None;
     }
 
+    pub fn keyrelease(&mut self, hex_key: u8) {
+        debug_assert!(
+            usize::from(hex_key) < self.keyboard.len(),
+            "key is not an hex key"
+        );
+
+        self.keyboard[usize::from(hex_key)] = false;
+    }
+
     pub fn emulate_cycle(&mut self) {
         if self.waiting_keypress_reg.is_some() {
             return;

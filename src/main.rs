@@ -9,6 +9,25 @@ use sdl2::pixels::Color;
 
 use structopt::StructOpt;
 
+const KEY_MAPPINGS: [Keycode; 16] = [
+    Keycode::X,
+    Keycode::Num1,
+    Keycode::Num2,
+    Keycode::Num3,
+    Keycode::Q,
+    Keycode::W,
+    Keycode::E,
+    Keycode::A,
+    Keycode::S,
+    Keycode::D,
+    Keycode::Z,
+    Keycode::C,
+    Keycode::Num4,
+    Keycode::R,
+    Keycode::F,
+    Keycode::V,
+];
+
 #[derive(Debug, StructOpt)]
 struct App {
     /// Game rom to play
@@ -55,9 +74,23 @@ fn main() {
                     keycode: Some(Keycode::Escape),
                     ..
                 } => return,
-                _ => {
-                    // TODO
+                Event::KeyDown {
+                    keycode: Some(kc), ..
+                } => {
+                    let hex_key = KEY_MAPPINGS.iter().position(|m| *m == kc);
+                    if let Some(hex_key) = hex_key {
+                        chip8.keypress(hex_key as u8);
+                    }
                 }
+                Event::KeyUp {
+                    keycode: Some(kc), ..
+                } => {
+                    let hex_key = KEY_MAPPINGS.iter().position(|m| *m == kc);
+                    if let Some(hex_key) = hex_key {
+                        chip8.keyrelease(hex_key as u8);
+                    }
+                }
+                _ => {}
             }
         }
 
