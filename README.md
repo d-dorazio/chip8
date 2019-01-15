@@ -1,9 +1,9 @@
 # Chip8 interpreter in Rust
 
 ```bash
+$ cargo run --release -- --help
 $ cargo run --release games/PONG
 ```
-
 ## Virtual Key mappings
 
 The original CHIP-8 had 16 virtual keys had the layout on the left, which has
@@ -18,6 +18,13 @@ been mapped (by default) to the keyboard layout on the right:
 
 To play PONG use <kbd>Q</kbd> and <kbd>1</kbd> to move the bar on the left up
 and down and <kbd>4</kbd> and <kbd>R</kbd> for bar on the right.
+
+## Notes
+
+The flickering is caused by how the interpreter draws sprites onto the screen.
+In particular, it performs a bitwise xor between the vram and the sprite to
+draw. This ends up in flickering when drawing a sprite over an existing sprite
+(`1 ^ 1 = 0`).
 
 ## Resources
 
