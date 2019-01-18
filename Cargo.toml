@@ -2,4 +2,5 @@
 members = [
     "chip8",
     "chip8-sdl",
+    "chip8-web/crate",
 ]
