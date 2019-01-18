@@ -1,0 +1,12 @@
+[package]
+name = "chip8-sdl"
+version = "0.1.0"
+authors = ["Daniele D'Orazio <d.dorazio96@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+rand = "0.6"
+structopt = "0.2"
+sdl2 = { version = "0.32", features = ["bundled"] }
+
+chip8 = { path = "../chip8" }
