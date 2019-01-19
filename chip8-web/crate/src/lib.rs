@@ -1,3 +1,5 @@
+mod beeper;
+
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -95,6 +97,8 @@ pub fn run() -> Result<(), JsValue> {
         on_key_release.forget();
     }
 
+    let beeper = beeper::Beeper::new().unwrap();
+
     register_animation_frame_loop(move || {
         let mut chip8 = chip8.borrow_mut();
 
@@ -114,7 +118,11 @@ pub fn run() -> Result<(), JsValue> {
             context.fill_rect(x as f64 * 10.0, y as f64 * 10.0, 10.0, 10.0);
         }
 
-        // TODO: audio
+        if chip8.beep() {
+            beeper.resume().unwrap();
+        } else {
+            beeper.pause().unwrap();
+        }
 
         chip8.decrease_timers();
     });

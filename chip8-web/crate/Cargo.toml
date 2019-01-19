@@ -37,6 +37,13 @@ features = [
   'KeyboardEvent',
   'Node',
   'Window',
+  'AudioParam',
+  'AudioContext',
+  'AudioDestinationNode',
+  'AudioNode',
+  'OscillatorType',
+  'OscillatorNode',
+  'GainNode',
 ]
 
 [features]
