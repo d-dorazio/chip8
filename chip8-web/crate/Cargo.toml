@@ -29,10 +29,12 @@ wee_alloc = { version = "0.4.2", optional = true }
 version = "0.3"
 features = [
   'CanvasRenderingContext2d',
+  'console',
   'Document',
   'Element',
-  'HtmlElement',
   'HtmlCanvasElement',
+  'HtmlElement',
+  'KeyboardEvent',
   'Node',
   'Window',
 ]

@@ -7,6 +7,8 @@ use wasm_bindgen;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 
+use web_sys::KeyboardEvent;
+
 cfg_if! {
     // When the `console_error_panic_hook` feature is enabled, we can call the
     // `set_panic_hook` function to get better error messages if we ever panic.
@@ -27,8 +29,15 @@ cfg_if! {
     }
 }
 
-const MAZE: &[u8] = include_bytes!("../../../games/MAZE");
+// const MAZE: &[u8] = include_bytes!("../../../games/MAZE");
+// const TETRIS: &[u8] = include_bytes!("../../../games/TETRIS");
+const PONG: &[u8] = include_bytes!("../../../games/PONG");
+
 const FREQ: usize = 500;
+
+const KEY_MAPPINGS: [&str; 16] = [
+    "x", "1", "2", "3", "q", "w", "e", "a", "s", "d", "z", "c", "4", "r", "f", "v",
+];
 
 #[wasm_bindgen]
 pub fn run() -> Result<(), JsValue> {
@@ -46,7 +55,8 @@ pub fn run() -> Result<(), JsValue> {
 
     body.append_child(&canvas)?;
 
-    let mut chip8 = chip8::Chip8::with_program(rand::rngs::OsRng::new().unwrap(), MAZE).unwrap();
+    let chip8 = chip8::Chip8::with_program(rand::rngs::OsRng::new().unwrap(), PONG).unwrap();
+    let chip8 = Rc::new(RefCell::new(chip8));
 
     let context = canvas
         .get_context("2d")
@@ -57,8 +67,36 @@ pub fn run() -> Result<(), JsValue> {
 
     context.fill_rect(0.0, 0.0, 640.0, 320.0);
 
+    {
+        let chip8 = chip8.clone();
+        let on_key_press = Closure::wrap(Box::new(move |e: KeyboardEvent| {
+            let hex_key = KEY_MAPPINGS.iter().position(|m| *m == e.key());
+
+            if let Some(hex_key) = hex_key {
+                chip8.borrow_mut().keypress(hex_key as u8);
+            }
+        }) as Box<dyn FnMut(KeyboardEvent)>);
+
+        document.set_onkeydown(Some(on_key_press.as_ref().unchecked_ref()));
+        on_key_press.forget();
+    }
+
+    {
+        let chip8 = chip8.clone();
+        let on_key_release = Closure::wrap(Box::new(move |e: KeyboardEvent| {
+            let hex_key = KEY_MAPPINGS.iter().position(|m| *m == e.key());
+
+            if let Some(hex_key) = hex_key {
+                chip8.borrow_mut().keyrelease(hex_key as u8);
+            }
+        }) as Box<dyn FnMut(KeyboardEvent)>);
+
+        document.set_onkeyup(Some(on_key_release.as_ref().unchecked_ref()));
+        on_key_release.forget();
+    }
+
     register_animation_frame_loop(move || {
-        // TODO: handle input
+        let mut chip8 = chip8.borrow_mut();
 
         for _ in 0..FREQ / 60 {
             chip8.emulate_cycle();
