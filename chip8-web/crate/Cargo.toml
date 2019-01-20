@@ -28,22 +28,23 @@ wee_alloc = { version = "0.4.2", optional = true }
 [dependencies.web-sys]
 version = "0.3"
 features = [
+  'AudioContext',
+  'AudioDestinationNode',
+  'AudioNode',
+  'AudioParam',
   'CanvasRenderingContext2d',
   'console',
+  'CssStyleDeclaration',
   'Document',
   'Element',
+  'GainNode',
   'HtmlCanvasElement',
   'HtmlElement',
   'KeyboardEvent',
   'Node',
-  'Window',
-  'AudioParam',
-  'AudioContext',
-  'AudioDestinationNode',
-  'AudioNode',
-  'OscillatorType',
   'OscillatorNode',
-  'GainNode',
+  'OscillatorType',
+  'Window',
 ]
 
 [features]
