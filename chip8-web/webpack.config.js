@@ -10,6 +10,12 @@ module.exports = {
     path: dist,
     filename: "bundle.js"
   },
+  module: {
+    rules: [{
+      test: /\.css$/,
+      use: ['style-loader', 'css-loader']
+    }]
+  },
   devServer: {
     contentBase: dist,
   },
