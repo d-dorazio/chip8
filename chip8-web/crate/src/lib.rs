@@ -46,7 +46,6 @@ pub fn run() -> Result<(), JsValue> {
     set_panic_hook();
 
     let document = window().document().expect("should have a Document");
-    let body = document.body().unwrap();
 
     let canvas = document
         .create_element("canvas")?
@@ -55,7 +54,10 @@ pub fn run() -> Result<(), JsValue> {
     canvas.set_width(640);
     canvas.set_height(320);
 
-    body.append_child(&canvas)?;
+    document
+        .get_element_by_id("game-container")
+        .unwrap()
+        .append_child(&canvas)?;
 
     let chip8 = chip8::Chip8::with_program(rand::rngs::OsRng::new().unwrap(), PONG).unwrap();
     let chip8 = Rc::new(RefCell::new(chip8));
@@ -108,9 +110,9 @@ pub fn run() -> Result<(), JsValue> {
 
         for (y, x, p) in chip8.pixels() {
             let style = if *p == 1 {
-                JsValue::from_str("white")
-            } else {
                 JsValue::from_str("black")
+            } else {
+                JsValue::from_str("white")
             };
 
             context.set_fill_style(&style);

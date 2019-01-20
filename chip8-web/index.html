@@ -2,11 +2,178 @@
 <html>
 
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+
   <title>Chip8-web</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
+  <link href="https://unpkg.com/nes.css/css/nes.css" rel="stylesheet" />
+  <style>
+    body {
+      padding: 0 2rem;
+      margin: 5% 20%;
+    }
+
+    #game-container {
+      margin: 50px 0;
+      min-width: 640px;
+    }
+
+    #game-container canvas {
+      display: block;
+      margin: auto;
+    }
+
+    .footer {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .github-link {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 999;
+      display: flex;
+      height: 100px;
+      color: #333;
+      text-decoration: none;
+    }
+
+    .github-link:hover {
+      text-decoration: none;
+    }
+
+    .github-link>p.nes-balloon {
+      align-self: flex-start;
+      padding: 0.2rem 0.5rem;
+      font-size: 0.8rem;
+      color: #333;
+    }
+
+    .github-link>i.nes-octocat {
+      align-self: flex-end;
+    }
+
+    /* show game on desktop */
+    @media only screen and (max-width: 1281px) {
+      #game-container {
+        display: none;
+      }
+    }
+
+    /* hide fork me on github link on mobile and remove margin */
+    @media screen and (max-width: 768px) {
+      body {
+        padding: 0;
+        margin: 2rem 0.2rem;
+      }
+
+      .balloon.nes-container .nes-balloon {
+        max-width: 70%;
+      }
+
+      .github-link {
+        display: none;
+      }
+    }
+  </style>
 </head>
 
 <body>
+  <h1>Chip 8</h1>
+  <a class="github-link" href="https://github.com/d-dorazio/chip8" target="_blank">
+    <p class="nes-balloon from-right">Fork me<br />on GitHub</p>
+    <i class="nes-octocat"></i>
+  </a>
+  <p>
+    Simple Chip 8 emulator built in Rust with a WASM and SDL backend. It's black
+    on white because yeah.
+  </p>
+
+  <div id="game-container" class="nes-container"></div>
+
+  <div id="app" class="nes-container with-title is-centered">
+    <p class="title">Keybindings</p>
+    <p style="margin: 20px;">
+      The original Chip 8 handles keyboard inputs via an hex keyboard that has
+      the following keys
+    </p>
+    <table class="nes-table is-bordered is-centered" style="margin: 20px auto">
+      <thead>
+        <th colspan=5>Chip 8 Hex Keyboard</th>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>2</td>
+          <td>3</td>
+          <td>C</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>5</td>
+          <td>6</td>
+          <td>D</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>8</td>
+          <td>9</td>
+          <td>E</td>
+        </tr>
+        <tr>
+          <td>A</td>
+          <td>0</td>
+          <td>B</td>
+          <td>F</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      which have been remapped to
+    </p>
+
+    <table class="nes-table is-bordered is-centered" style="margin: 20px auto">
+      <th colspan=5>Virtual key bindings</th>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>2</td>
+          <td>3</td>
+          <td>4</td>
+        </tr>
+        <tr>
+          <td>Q</td>
+          <td>W</td>
+          <td>E</td>
+          <td>R</td>
+        </tr>
+        <tr>
+          <td>A</td>
+          <td>S</td>
+          <td>D</td>
+          <td>F</td>
+        </tr>
+        <tr>
+          <td>Z</td>
+          <td>X</td>
+          <td>C</td>
+          <td>V</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer">
+    <a href="https://github.com/d-dorazio/chip8">
+      <p><i class="nes-icon github"></i></p>
+    </a>
+  </div>
+
 </body>
 
 </html>
