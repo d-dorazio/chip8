@@ -6,7 +6,7 @@
   "license": "Apache-2.0/MIT",
   "scripts": {
     "start": "webpack-dev-server -d",
-    "build": "webpack"
+    "build": "webpack -p"
   },
   "devDependencies": {
     "@wasm-tool/wasm-pack-plugin": "0.2.1",
