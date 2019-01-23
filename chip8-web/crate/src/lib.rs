@@ -31,9 +31,12 @@ cfg_if! {
     }
 }
 
-// const MAZE: &[u8] = include_bytes!("../../../games/MAZE");
-// const TETRIS: &[u8] = include_bytes!("../../../games/TETRIS");
-const PONG: &[u8] = include_bytes!("../../../games/PONG");
+const GAMES: [(&str, &[u8]); 4] = [
+    ("MAZE", include_bytes!("../../../games/MAZE")),
+    ("TETRIS", include_bytes!("../../../games/TETRIS")),
+    ("PONG", include_bytes!("../../../games/PONG")),
+    ("SIERPINKSI", include_bytes!("../../../games/SIERPINKSI")),
+];
 
 const FREQ: usize = 500;
 
@@ -45,6 +48,43 @@ const KEY_MAPPINGS: [&str; 16] = [
 pub fn run() -> Result<(), JsValue> {
     set_panic_hook();
 
+    let document = window().document().expect("should have a Document");
+    let select = document
+        .create_element("select")?
+        .dyn_into::<web_sys::HtmlSelectElement>()?;
+
+    select.add_with_html_option_element(&web_sys::HtmlOptionElement::new_with_text("-")?)?;
+
+    for (game, _) in &GAMES {
+        let option = web_sys::HtmlOptionElement::new_with_text(game)?;
+        select.add_with_html_option_element(&option)?;
+    }
+
+    let on_game_selected = Closure::wrap(Box::new(move |e: web_sys::Event| {
+        web_sys::console::log_1(&e);
+        let select = e.target().unwrap().dyn_into::<web_sys::HtmlSelectElement>().unwrap();
+        let game_id = select.value();
+
+        let game_rom = GAMES.iter().find(|(g, _)| g == &game_id);
+
+        if let Some(game_rom) = game_rom {
+            select.style().set_property("display", "none").unwrap();
+            play_game(game_rom.1).unwrap();
+        }
+    }) as Box<dyn FnMut(web_sys::Event)>);
+
+    select.set_onchange(Some(on_game_selected.as_ref().unchecked_ref()));
+    on_game_selected.forget();
+
+    document
+        .get_element_by_id("game-container")
+        .unwrap()
+        .append_child(&select)?;
+
+    Ok(())
+}
+
+fn play_game(rom: &[u8]) -> Result<(), JsValue> {
     let document = window().document().expect("should have a Document");
 
     let canvas = document
@@ -59,7 +99,7 @@ pub fn run() -> Result<(), JsValue> {
         .unwrap()
         .append_child(&canvas)?;
 
-    let chip8 = chip8::Chip8::with_program(rand::rngs::OsRng::new().unwrap(), PONG).unwrap();
+    let chip8 = chip8::Chip8::with_program(rand::rngs::OsRng::new().unwrap(), rom).unwrap();
     let chip8 = Rc::new(RefCell::new(chip8));
 
     let context = canvas
@@ -109,7 +149,7 @@ pub fn run() -> Result<(), JsValue> {
         }
 
         for (y, x, p) in chip8.pixels() {
-            let style = if *p == 1 {
+            let style = if *p == 0 {
                 JsValue::from_str("black")
             } else {
                 JsValue::from_str("white")
