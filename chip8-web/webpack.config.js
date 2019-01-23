@@ -1,6 +1,7 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CleanWebpackPlugin = require('clean-webpack-plugin')
 
 const dist = path.resolve(__dirname, "dist");
 const WasmPackPlugin = require("@wasm-tool/wasm-pack-plugin");
@@ -19,6 +20,8 @@ module.exports = {
   },
 
   plugins: [
+    new CleanWebpackPlugin(['dist']),
+
     new HtmlWebpackPlugin({
       template: 'index.html'
     }),
