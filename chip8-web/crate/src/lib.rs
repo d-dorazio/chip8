@@ -31,11 +31,30 @@ cfg_if! {
     }
 }
 
-const GAMES: [(&str, &[u8]); 4] = [
+const GAMES: [(&str, &[u8]); 23] = [
+    ("15PUZZLE", include_bytes!("../../../games/15PUZZLE")),
+    ("BLINKY", include_bytes!("../../../games/BLINKY")),
+    ("BLITZ", include_bytes!("../../../games/BLITZ")),
+    ("BRIX", include_bytes!("../../../games/BRIX")),
+    ("CONNECT4", include_bytes!("../../../games/CONNECT4")),
+    ("GUESS", include_bytes!("../../../games/GUESS")),
+    ("HIDDEN", include_bytes!("../../../games/HIDDEN")),
+    ("INVADERS", include_bytes!("../../../games/INVADERS")),
+    ("KALEID", include_bytes!("../../../games/KALEID")),
     ("MAZE", include_bytes!("../../../games/MAZE")),
-    ("TETRIS", include_bytes!("../../../games/TETRIS")),
+    ("MERLIN", include_bytes!("../../../games/MERLIN")),
+    ("MISSILE", include_bytes!("../../../games/MISSILE")),
     ("PONG", include_bytes!("../../../games/PONG")),
+    ("PUZZLE", include_bytes!("../../../games/PUZZLE")),
     ("SIERPINKSI", include_bytes!("../../../games/SIERPINKSI")),
+    ("SYZYGY", include_bytes!("../../../games/SYZYGY")),
+    ("TANK", include_bytes!("../../../games/TANK")),
+    ("TETRIS", include_bytes!("../../../games/TETRIS")),
+    ("TICTAC", include_bytes!("../../../games/TICTAC")),
+    ("UFO", include_bytes!("../../../games/UFO")),
+    ("VBRIX", include_bytes!("../../../games/VBRIX")),
+    ("VERS", include_bytes!("../../../games/VERS")),
+    ("WIPEOFF", include_bytes!("../../../games/WIPEOFF")),
 ];
 
 const FREQ: usize = 500;
@@ -62,7 +81,11 @@ pub fn run() -> Result<(), JsValue> {
 
     let on_game_selected = Closure::wrap(Box::new(move |e: web_sys::Event| {
         web_sys::console::log_1(&e);
-        let select = e.target().unwrap().dyn_into::<web_sys::HtmlSelectElement>().unwrap();
+        let select = e
+            .target()
+            .unwrap()
+            .dyn_into::<web_sys::HtmlSelectElement>()
+            .unwrap();
         let game_id = select.value();
 
         let game_rom = GAMES.iter().find(|(g, _)| g == &game_id);
