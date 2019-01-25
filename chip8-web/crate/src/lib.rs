@@ -80,7 +80,6 @@ pub fn run() -> Result<(), JsValue> {
     }
 
     let on_game_selected = Closure::wrap(Box::new(move |e: web_sys::Event| {
-        web_sys::console::log_1(&e);
         let select = e
             .target()
             .unwrap()
