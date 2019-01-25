@@ -1,11 +1,121 @@
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Chip8</title>
-</head>
-<body>
+<!DOCTYPE html>
+<html>
 
-</body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+
+  <title>Chip8-web</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
+
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <h1>Chip 8</h1>
+  <a class="github-link" href="https://github.com/d-dorazio/chip8" target="_blank">
+    <p class="nes-balloon from-right">Fork me<br />on GitHub</p>
+    <i class="nes-octocat"></i>
+  </a>
+  <p>
+    Simple Chip 8 emulator built in Rust with a WASM and SDL backend. It's black
+    on white because yeah.
+  </p>
+
+  <div id="game-container" class="nes-container with-title">
+    <p class="title">Emulator</p>
+  </div>
+
+  <div id="game-container-warning" class="nes-container">
+    <p class="title">I'm sorry but the emulator is playable only on a bigger screen.</p>
+  </div>
+
+  <div id="app" class="nes-container with-title is-centered">
+    <p class="title">Keybindings</p>
+    <p style="margin: 20px;">
+      The original Chip 8 handles keyboard inputs via an hex keyboard that has
+      the following keys
+    </p>
+    <table class="nes-table is-bordered is-centered" style="margin: 20px auto">
+      <thead>
+        <th colspan=5>Chip 8 Hex Keyboard</th>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>2</td>
+          <td>3</td>
+          <td>C</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>5</td>
+          <td>6</td>
+          <td>D</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>8</td>
+          <td>9</td>
+          <td>E</td>
+        </tr>
+        <tr>
+          <td>A</td>
+          <td>0</td>
+          <td>B</td>
+          <td>F</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      which have been remapped to
+    </p>
+
+    <table class="nes-table is-bordered is-centered" style="margin: 20px auto">
+      <th colspan=5>Virtual key bindings</th>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>2</td>
+          <td>3</td>
+          <td>4</td>
+        </tr>
+        <tr>
+          <td>Q</td>
+          <td>W</td>
+          <td>E</td>
+          <td>R</td>
+        </tr>
+        <tr>
+          <td>A</td>
+          <td>S</td>
+          <td>D</td>
+          <td>F</td>
+        </tr>
+        <tr>
+          <td>Z</td>
+          <td>X</td>
+          <td>C</td>
+          <td>V</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      For example, to play PONG use Q and 1 to move the bar on the left up and
+      down and 4 and R for bar on the right.
+    </p>
+  </div>
+
+  <div class="footer">
+    <a href="https://github.com/d-dorazio/chip8">
+      <p><i class="nes-icon github"></i></p>
+    </a>
+  </div>
+<script type="text/javascript" src="bundle.js"></script></body>
+
 </html>
