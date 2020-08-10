@@ -3,33 +3,15 @@ mod beeper;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use cfg_if::cfg_if;
-
 use wasm_bindgen;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 
 use web_sys::KeyboardEvent;
 
-cfg_if! {
-    // When the `console_error_panic_hook` feature is enabled, we can call the
-    // `set_panic_hook` function to get better error messages if we ever panic.
-    if #[cfg(feature = "console_error_panic_hook")] {
-        use console_error_panic_hook::set_once as set_panic_hook;
-    } else {
-        #[inline]
-        fn set_panic_hook() {}
-    }
-}
-
-cfg_if! {
-    // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
-    // allocator.
-    if #[cfg(feature = "wee_alloc")] {
-        #[global_allocator]
-        static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
-    }
-}
+#[cfg(feature = "wee_alloc")]
+#[global_allocator]
+static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 const GAMES: [(&str, &[u8]); 23] = [
     ("15PUZZLE", include_bytes!("../../../games/15PUZZLE")),
@@ -65,7 +47,8 @@ const KEY_MAPPINGS: [&str; 16] = [
 
 #[wasm_bindgen]
 pub fn run() -> Result<(), JsValue> {
-    set_panic_hook();
+    #[cfg(feature = "console_error_panic_hook")]
+    console_error_panic_hook::set_once();
 
     let document = window().document().expect("should have a Document");
     let select = document
@@ -121,7 +104,7 @@ fn play_game(rom: &[u8]) -> Result<(), JsValue> {
         .unwrap()
         .append_child(&canvas)?;
 
-    let chip8 = chip8::Chip8::with_program(rand::rngs::OsRng::new().unwrap(), rom).unwrap();
+    let chip8 = chip8::Chip8::with_program(rand::thread_rng(), rom).unwrap();
     let chip8 = Rc::new(RefCell::new(chip8));
 
     let context = canvas
@@ -206,12 +189,12 @@ fn register_animation_frame_loop<F: FnMut() + 'static>(mut fun: F) {
         fun();
 
         request_animation_frame(f.borrow().as_ref().unwrap());
-    }) as Box<FnMut()>));
+    }) as Box<dyn FnMut()>));
 
     request_animation_frame(g.borrow().as_ref().unwrap());
 }
 
-fn request_animation_frame(f: &Closure<FnMut()>) {
+fn request_animation_frame(f: &Closure<dyn FnMut()>) {
     window()
         .request_animation_frame(f.as_ref().unchecked_ref())
         .expect("should register `requestAnimationFrame` OK");

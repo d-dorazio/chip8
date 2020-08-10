@@ -24,7 +24,7 @@ impl Beeper {
         gain.connect_with_audio_node(&audio_ctx.destination())?;
 
         oscillator.start()?;
-        audio_ctx.suspend()?;
+        audio_ctx.suspend().map(|_| ())?;
 
         Ok(Beeper {
             audio_ctx,
